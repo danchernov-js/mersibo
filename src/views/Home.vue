@@ -9,6 +9,7 @@
         v-model="chairman"
         placeholder="Фамилия И.О."
       >
+      <p>*при печати все окна ввода на странице не отображаются</p>
     </div>
     
     <MyDocument 
@@ -36,6 +37,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  p {
+    font-size: 10px;
+    font-style: italic;
+    margin: 10px 0 0 0;
+  }
   .chair {
     background-color: coral;
     margin-bottom: 50px;

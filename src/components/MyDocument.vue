@@ -9,13 +9,13 @@
             с Управляющим советом <br>
             от____________20____г <br>
             Председатель УС:<br>
-            ___________ {{chairman}} <br>
+            ___________ <span v-if="chairman == ''">(Ф.И.О.)</span>{{chairman}} <br>
               подпись
           </td>
           <td class="sign-col" width="25%">«Утверждено» приказом <br>
               от___________20____г №_______ <br>
               <br>
-              Должность: {{post}} <br>
+              Должность: <span v-if="post == ''">(наименование должности)</span>{{post}} <br>
               <input type="text" v-model="post" placeholder="Введите должность">
           </td>
         </tr>
@@ -69,26 +69,19 @@
       <div class="item">
         <div class="item__num">2.3.</div>
         <div class="item__text">
-          Структура характеристики включает: <br>
+          Структура характеристики включает: <span v-if="selectedElements1 == undefined">(выберите ниже)</span><br>
 
-          <select>
-            <optgroup label="Group Name">
-              <option>Nested option</option>
-            </optgroup>
-          </select>
-
-          <!-- <select 
-            class="form-select" 
-            multiple 
-            aria-label="multiple select"
-            v-model="selectedElements"
-          >
-            <option 
-              v-for="els in elements"
-            
-            
-            >Open this select menu</option>
-          </select> -->
+          <v-select 
+            multiple
+            label="text" 
+            :options="elements1" 
+            v-model="selectedElements1"
+            class="mySelects"
+          ></v-select>
+          <ul>
+            <li v-for="selectedElement in selectedElements1" :key="selectedElement.id">
+            {{selectedElement.text}}</li>
+          </ul>
 
         </div>
       </div>
@@ -96,12 +89,16 @@
         <div class="item__num">2.4.</div>
         <div class="item__text">
           Программа сотрудничества специалистов с семьей обучающегося включает перечень направлений сотрудничества, мероприятий и форм сотрудничества организации и семьи обучающегося, а также частоту и сроки проведения мероприятий.
-          <p>Программа сотрудничества специалистов с семьей обучающегося предусматривает:</p>
-          <ol>
-            <li>психологическую поддержку семьи, консультации по всем вопросам оказания психолого-педагогической помощи ребенку;</li>
-            <li>просвещение по вопросам воспитания и обучения ребенка-инвалида;</li>
-            <li>регулярные контакты родителей и специалистов в течение всего учебного года и др.</li>
-          </ol>
+          <p>Программа сотрудничества специалистов с семьей обучающегося предусматривает: <span v-if="selectedElements2 == undefined">(выберите ниже)</span></p>
+          <v-select 
+              v-model="selectedElements2" 
+              label="text" 
+              :options="elements2"
+              class="mySelects"
+          ></v-select>
+          <ul v-if="selectedElements2 !== undefined">
+            <li>{{selectedElements2.text}}</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -237,28 +234,39 @@
 </template>
 
 <script>
-// import select2 from "vue-select2"
-
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 export default {
   name: 'MyDocument',
   props: ['chairman'],
-  // components: {
-  //   select2
-  // },
+  components: {
+    "v-select": vSelect
+  },
   data() {
     return {
       post: '',
-      elements: [
-        {id: 1, text: 'год обучения в образовательной организации;'},
-        {id: 2, text: 'сведения о семье (социально-бытовые условия, взаимоотношения в семье, отношение к ребенку);'},
-        {id: 3, text: 'данные о физическом здоровье, двигательном и сенсорном развитии ребенка; '},
+      elements1: [
+        {id: 1, text: 'год обучения в образовательной организации'},
+        {id: 2, text: 'сведения о семье (социально-бытовые условия, взаимоотношения в семье, отношение к ребенку)'},
+        {id: 3, text: 'данные о физическом здоровье, двигательном и сенсорном развитии ребенка'},
         {id: 4, text: 'представления об окружающем мире (о себе, ближайшем окружении, природном, растительном, социальном мире)'},
-        {id: 5, text: 'выводы по итогам оценки.'},
+        {id: 5, text: 'выводы по итогам оценки'},
       ],
-      selectedElements: undefined
+      elements2: [
+        {id: 1, text: 'психологическую поддержку семьи, консультации по всем вопросам оказания психолого-педагогической помощи ребенку'},
+        {id: 2, text: 'просвещение по вопросам воспитания и обучения ребенка-инвалида'},
+        {id: 3, text: 'регулярные контакты родителей и специалистов в течение всего учебного года и др'}
+      ],
+      selectedElements1: undefined,
+      selectedElements2: undefined
     }
-  }
+  },
+  // computed: {
+  //   selectedResult(selectedElements1) {
+  //     selectedElements1.forEach(element => console.log(element));
+  //   }
+  // }
 }
 </script>
 
@@ -270,11 +278,18 @@ export default {
   font-weight: normal;
 }
 
+.doc {
+  margin: 0 5px 0 5px;
+}
 h2 {
   font-size: 14px;
 }
 h3 {
   font-size: 14px;
+
+  &:not(:first-child) {
+  margin-top: 1rem;
+  }
 }
 h4 {
   font-size: 12px;
@@ -290,11 +305,24 @@ h4 {
   &__text {
     margin-left: 10px;
     text-align: justify;
+    width: 100%;
+
+    & > p {
+      margin-bottom: 0;
+    }
   }
 }
 
 input {
   font-size: 8px;
+}
+
+.mySelects {
+  margin: 20px 0;
+}
+
+p {
+  margin: 1rem 0 1rem 0;
 }
 
 .list-1 {
@@ -352,6 +380,10 @@ input {
 
 @media print {
   input {
+    display: none;
+  }
+
+  .mySelects {
     display: none;
   }
 }
